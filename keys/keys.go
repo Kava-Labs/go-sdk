@@ -12,28 +12,32 @@ import (
 	"strings"
 
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/cosmos/go-bip39"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/go-bip39"
+	"github.com/kava-labs/go-sdk/tx"
+	"github.com/kava-labs/kava/app"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 const (
 	defaultBIP39Passphrase = ""
-	// TODO: Change BIP44Prefix
-	BIP44Prefix = "44'/714'/"
-	PartialPath = "0'/0/0"
-	FullPath    = BIP44Prefix + PartialPath
+	BIP44Prefix            = "44'/188'/"
+	PartialPath            = "0'/0/0"
+	FullPath               = BIP44Prefix + PartialPath
 )
 
 type KeyManager interface {
 	GetPrivKey() crypto.PrivKey
 	GetAddr() sdk.AccAddress
-	Sign(sdk.Msg) ([]byte, error)
+	Sign(tx.StdSignMsg) ([]byte, error)
 }
 
 func NewMnemonicKeyManager(mnemonic string) (KeyManager, error) {
+	config := sdk.GetConfig()
+	app.SetBech32AddressPrefixes(config)
+	config.Seal()
+
 	k := keyManager{}
 	err := k.recoveryFromMnemonic(mnemonic, FullPath)
 	return &k, err
@@ -60,6 +64,7 @@ func (m *keyManager) GetAddr() sdk.AccAddress {
 }
 
 func (m *keyManager) recoveryFromMnemonic(mnemonic, keyPath string) error {
+
 	words := strings.Split(mnemonic, " ")
 	if len(words) != 12 && len(words) != 24 {
 		return fmt.Errorf("mnemonic length should either be 12 or 24")
