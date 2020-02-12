@@ -2,9 +2,7 @@ package types
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -79,51 +77,4 @@ func Fixed8DecodeString(s string) (Fixed8, error) {
 		fp *= 10
 	}
 	return Fixed8(ip*Fixed8Decimals + fp), nil
-}
-
-// UnmarshalJSON implements the json unmarshaller interface
-func (f *Fixed8) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err == nil {
-		p, err := Fixed8DecodeString(s)
-		if err != nil {
-			return err
-		}
-		*f = p
-		return nil
-	}
-
-	var fl float64
-	if err := json.Unmarshal(data, &fl); err != nil {
-		return err
-	}
-
-	*f = Fixed8(float64(Fixed8Decimals) * fl)
-	return nil
-}
-
-// MarshalJSON implements the json marshaller interface
-func (f *Fixed8) MarshalJSON() ([]byte, error) {
-	var s = f.String()
-	return json.Marshal(s)
-}
-
-type Double float64
-
-func (n *Double) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err == nil {
-		if p, err := strconv.ParseFloat(s, 64); err == nil {
-			*n = Double(p)
-		} else {
-			return err
-		}
-	} else {
-		return err
-	}
-	return nil
-}
-
-func (n *Double) MarshalJSON() ([]byte, error) {
-	return json.Marshal(fmt.Sprintf("%.8f", float64(*n)))
 }
