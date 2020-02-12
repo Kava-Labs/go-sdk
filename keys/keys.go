@@ -22,7 +22,7 @@ import (
 
 const (
 	defaultBIP39Passphrase = ""
-	BIP44Prefix            = "44'/188'/"
+	BIP44Prefix            = "44'/118'/"
 	PartialPath            = "0'/0/0"
 	FullPath               = BIP44Prefix + PartialPath
 )

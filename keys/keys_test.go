@@ -8,7 +8,7 @@ import (
 
 const (
 	TestMnenomic     = "equip town gesture square tomorrow volume nephew minute witness beef rich gadget actress egg sing secret pole winter alarm law today check violin uncover"
-	TestExpectedAddr = "kava1gflyk57p2ppflqjszyak29x62wuw955eqrzcmy"
+	TestExpectedAddr = "kava15qdefkmwswysgg4qxgqpqr35k3m49pkx2jdfnw"
 )
 
 func TestNewMnemonicKeyManager(t *testing.T) {
