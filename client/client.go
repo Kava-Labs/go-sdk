@@ -9,7 +9,7 @@ import (
 
 	depCommon "github.com/binance-chain/bep3-deputy/common"
 	"github.com/binance-chain/bep3-deputy/store"
-	"github.com/kava-labs/kava-deputy/go-sdk/keys"
+	"github.com/kava-labs/go-sdk/keys"
 	"github.com/kava-labs/kava/app"
 )
 
