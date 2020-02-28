@@ -1,4 +1,4 @@
-package keys
+package kava
 
 import (
 	"crypto/hmac"
@@ -12,33 +12,40 @@ import (
 	"strings"
 
 	"github.com/btcsuite/btcd/btcec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/go-bip39"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 const (
 	defaultBIP39Passphrase = ""
-	// TODO: Change BIP44Prefix
-	BIP44Prefix = "44'/714'/"
-	PartialPath = "0'/0/0"
-	FullPath    = BIP44Prefix + PartialPath
+	BIP44Prefix            = "44'/118'/"
+	PartialPath            = "0'/0/0"
+	FullPath               = BIP44Prefix + PartialPath
 )
 
+// KeyManager is an interface for common methods on KeyManagers
 type KeyManager interface {
 	GetPrivKey() crypto.PrivKey
 	GetAddr() sdk.AccAddress
-	Sign(sdk.Msg) ([]byte, error)
+	GetCodec() *amino.Codec
+	SetCodec(*amino.Codec)
+	Sign(authtypes.StdSignMsg) ([]byte, error)
 }
 
+// NewMnemonicKeyManager creates a new KeyManager from a mnenomic
 func NewMnemonicKeyManager(mnemonic string) (KeyManager, error) {
 	k := keyManager{}
 	err := k.recoveryFromMnemonic(mnemonic, FullPath)
+
 	return &k, err
 }
 
+// NewPrivateKeyManager creates a new KeyManager from a private key
 func NewPrivateKeyManager(priKey string) (KeyManager, error) {
 	k := keyManager{}
 	err := k.recoveryFromPrivateKey(priKey)
@@ -46,6 +53,7 @@ func NewPrivateKeyManager(priKey string) (KeyManager, error) {
 }
 
 type keyManager struct {
+	cdc      *amino.Codec
 	privKey  crypto.PrivKey
 	addr     sdk.AccAddress
 	mnemonic string
@@ -59,7 +67,49 @@ func (m *keyManager) GetAddr() sdk.AccAddress {
 	return m.addr
 }
 
+func (m *keyManager) GetCodec() *amino.Codec {
+	return m.cdc
+}
+
+func (m *keyManager) SetCodec(codec *amino.Codec) {
+	m.cdc = codec
+}
+
+// Sign signs a standard msg and marshals the result to bytes
+func (m *keyManager) Sign(stdMsg authtypes.StdSignMsg) ([]byte, error) {
+	sig, err := m.makeSignature(stdMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	newTx := authtypes.NewStdTx(stdMsg.Msgs, stdMsg.Fee, []authtypes.StdSignature{sig}, stdMsg.Memo)
+
+	bz, err := m.cdc.MarshalBinaryLengthPrefixed(&newTx)
+	if err != nil {
+		return nil, err
+	}
+
+	return bz, nil
+}
+
+func (m *keyManager) makeSignature(msg authtypes.StdSignMsg) (sig authtypes.StdSignature, err error) {
+	if err != nil {
+		return
+	}
+
+	sigBytes, err := m.privKey.Sign(msg.Bytes())
+	if err != nil {
+		return
+	}
+
+	return authtypes.StdSignature{
+		PubKey:    m.privKey.PubKey(),
+		Signature: sigBytes,
+	}, nil
+}
+
 func (m *keyManager) recoveryFromMnemonic(mnemonic, keyPath string) error {
+
 	words := strings.Split(mnemonic, " ")
 	if len(words) != 12 && len(words) != 24 {
 		return fmt.Errorf("mnemonic length should either be 12 or 24")

@@ -1,99 +1,158 @@
 package client
 
 import (
-	"time"
+	"fmt"
 
+	"github.com/binance-chain/bep3-deputy/util"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ethereum/go-ethereum/common"
-	amino "github.com/tendermint/go-amino"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/tendermint/go-amino"
+	"github.com/tendermint/tendermint/rpc/client"
+	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 
-	depCommon "github.com/binance-chain/bep3-deputy/common"
-	"github.com/binance-chain/bep3-deputy/store"
 	"github.com/kava-labs/go-sdk/keys"
-	"github.com/kava-labs/kava/app"
 )
 
-// Client for interacting with kava
-type Client struct {
-	Cdc  *amino.Codec
-	Url  string
-	Keys keys.KeyManager
+// KavaClient facilitates interaction with the Kava blockchain
+type KavaClient struct {
+	Network ChainNetwork
+	HTTP    *client.HTTP
+	Keybase keys.KeyManager
 }
 
-// NewClient initializes a new client
-func NewClient(url string, keyManager keys.KeyManager) Client {
-	cdc := app.MakeCodec()
+// NewKavaClient creates a new KavaClient
+func NewKavaClient(cdc *amino.Codec, mnemonic string, rpcAddr string, networkType ChainNetwork) *KavaClient {
+	// Set up HTTP client
+	http := client.NewHTTP(rpcAddr, "/websocket")
 
-	config := sdk.GetConfig()
-	app.SetBech32AddressPrefixes(config)
-	config.Seal()
+	// TODO: import chain?
+	http.Logger = util.SdkLogger
 
-	client := Client{
-		Cdc:  cdc,
-		Url:  url,
-		Keys: keyManager,
+	// Set up key manager
+	keyManager, err := NewMnemonicKeyManager(mnemonic)
+	if err != nil {
+		panic(fmt.Sprintf("new key manager from mnenomic err, err=%s", err.Error()))
 	}
 
-	// 	TODO: client.Start()
-
-	return client
+	return &KavaClient{
+		Network: networkType,
+		HTTP:    http,
+		Keybase: keyManager,
+	}
 }
 
-// GetHeight returns current height of chain
-func (c *Client) GetHeight() (int64, error) {
-	// TODO:
-	return 0, nil
+// TODO: "options ...tx.Option"
+func (kc *KavaClient) broadcast(m sdk.Msg, syncType SyncType) (*ctypes.ResultBroadcastTx, error) {
+	signBz, err := kc.sign(m) // TODO: "options..."
+	if err != nil {
+		return nil, err
+	}
+	switch syncType {
+	case Async:
+		return kc.BroadcastTxAsync(signBz)
+	case Sync:
+		return kc.BroadcastTxSync(signBz)
+	case Commit:
+		commitRes, err := kc.BroadcastTxCommit(signBz)
+		if err != nil {
+			return nil, err
+		}
+		if commitRes.CheckTx.IsErr() {
+			return &ctypes.ResultBroadcastTx{
+				Code: commitRes.CheckTx.Code,
+				Log:  commitRes.CheckTx.Log,
+				Hash: commitRes.Hash,
+				Data: commitRes.CheckTx.Data,
+			}, nil
+		}
+		return &ctypes.ResultBroadcastTx{
+			Code: commitRes.DeliverTx.Code,
+			Log:  commitRes.DeliverTx.Log,
+			Hash: commitRes.Hash,
+			Data: commitRes.DeliverTx.Data,
+		}, nil
+	default:
+		return nil, fmt.Errorf("unknown synctype")
+	}
 }
 
-// GetFetchInterval returns fetch interval of the chain like average blocking time, it is used in observer
-func (c *Client) GetFetchInterval() time.Duration {
-	// TODO:
-	return time.Duration(1)
-}
-
-// GetBlockAndTxs returns block info and txs included in this block
-func (c *Client) GetBlockAndTxs(height int64) (*depCommon.BlockAndTxLogs, error) {
-	// TODO:
-
-	txLogs := make([]*store.TxLog, 0)
-
-	blockAndTxLogs := depCommon.BlockAndTxLogs{
-		Height:          int64(0),
-		BlockHash:       "",
-		ParentBlockHash: "",
-		BlockTime:       int64(0),
-		TxLogs:          txLogs,
+// TODO: options ...tx.Option
+func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
+	if kc.Keybase == nil {
+		return nil, fmt.Errorf("Keys are missing, must to set key")
 	}
 
-	return &blockAndTxLogs, nil
+	chainID := TestChainID
+	if kc.Network != ProdNetwork {
+		chainID = TestChainID
+	}
+
+	signMsg := &authtypes.StdSignMsg{
+		ChainID:       chainID,
+		AccountNumber: 0, // TODO: -1
+		Sequence:      0,
+		Fee:           authtypes.NewStdFee(200000, sdk.NewCoins(sdk.NewCoin("ukava", sdk.NewInt(250000)))),
+		Msgs:          []sdk.Msg{m},
+		Memo:          "",
+	}
+
+	// for _, op := range options {
+	// 	signMsg = op(signMsg)
+	// }
+
+	if signMsg.Sequence == 0 || signMsg.AccountNumber == 0 { // TODO: -1
+		fromAddr := kc.Keybase.GetAddr()
+		acc, err := kc.GetAccount(fromAddr)
+		if err != nil {
+			return nil, err
+		}
+
+		if acc.Address.Empty() {
+			return nil, fmt.Errorf("the signer account does not exist on kava")
+		}
+
+		signMsg.Sequence = acc.Sequence
+		signMsg.AccountNumber = acc.AccountNumber
+	}
+
+	for _, m := range signMsg.Msgs {
+		if err := m.ValidateBasic(); err != nil {
+			return nil, err
+		}
+	}
+
+	// TODO: remove print
+	fmt.Println("Attempting to sign msg:", *signMsg)
+
+	signedMsg, err := kc.Keybase.Sign(*signMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	return signedMsg, nil
 }
 
-// GetSentTxStatus returns status of tx sent
-func (c *Client) GetSentTxStatus(hash string) store.TxStatus {
-	// TODO:
-	return "tx_status"
+// BroadcastTxCommit sends a transaction using commit
+func (kc *KavaClient) BroadcastTxCommit(tx tmtypes.Tx) (*ctypes.ResultBroadcastTxCommit, error) {
+	if err := ValidateTx(tx); err != nil {
+		return nil, err
+	}
+	return kc.HTTP.BroadcastTxCommit(tx)
 }
 
-// GetBalanceAlertMsg returns balance alert message if necessary, like account balance is less than amount in config
-func (c *Client) GetBalanceAlertMsg() (string, error) {
-	// TODO:
-	return "", nil
+// BroadcastTxAsync sends a transaction using async
+func (kc *KavaClient) BroadcastTxAsync(tx tmtypes.Tx) (*ctypes.ResultBroadcastTx, error) {
+	if err := ValidateTx(tx); err != nil {
+		return nil, err
+	}
+	return kc.HTTP.BroadcastTxAsync(tx)
 }
 
-// Claimable returns is swap claimable
-func (c *Client) Claimable(swapId common.Hash) (bool, error) {
-	// TODO:
-	return false, nil
-}
-
-// Refundable returns is swap refundable
-func (c *Client) Refundable(swapId common.Hash) (bool, error) {
-	// TODO:
-	return false, nil
-}
-
-// HasSwap returns does swap exist
-func (c *Client) HasSwap(swapId common.Hash) (bool, error) {
-	// TODO:
-	return false, nil
+// BroadcastTxSync sends a transaction using sync
+func (kc *KavaClient) BroadcastTxSync(tx tmtypes.Tx) (*ctypes.ResultBroadcastTx, error) {
+	if err := ValidateTx(tx); err != nil {
+		return nil, err
+	}
+	return kc.HTTP.BroadcastTxSync(tx)
 }
