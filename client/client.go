@@ -30,7 +30,7 @@ func NewKavaClient(cdc *amino.Codec, mnemonic string, rpcAddr string, networkTyp
 	http.Logger = util.SdkLogger
 
 	// Set up key manager
-	keyManager, err := NewMnemonicKeyManager(mnemonic)
+	keyManager, err := keys.NewMnemonicKeyManager(mnemonic)
 	if err != nil {
 		panic(fmt.Sprintf("new key manager from mnenomic err, err=%s", err.Error()))
 	}
