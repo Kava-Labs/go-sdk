@@ -43,7 +43,7 @@ func NewKavaClient(cdc *amino.Codec, mnemonic string, rpcAddr string, networkTyp
 }
 
 // TODO: "options ...tx.Option"
-func (kc *KavaClient) broadcast(m sdk.Msg, syncType SyncType) (*ctypes.ResultBroadcastTx, error) {
+func (kc *KavaClient) Broadcast(m sdk.Msg, syncType SyncType) (*ctypes.ResultBroadcastTx, error) {
 	signBz, err := kc.sign(m) // TODO: "options..."
 	if err != nil {
 		return nil, err
