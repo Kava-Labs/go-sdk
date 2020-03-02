@@ -4,4 +4,4 @@ The Kava Go SDK provides unique types and functionality required by services tha
 
 client - sends transactions and queries to Kava's blockchain
 
-keys - management of private keys and account recovery from mnenomic phrase.  
+keys - management of private keys and account recovery from mnenomic phrase  

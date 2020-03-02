@@ -19,8 +19,6 @@ import (
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-
-	"github.com/kava-labs/kava/app"
 )
 
 const (
@@ -41,13 +39,8 @@ type KeyManager interface {
 
 // NewMnemonicKeyManager creates a new KeyManager from a mnenomic
 func NewMnemonicKeyManager(mnemonic string) (KeyManager, error) {
-	config := sdk.GetConfig()
-	app.SetBech32AddressPrefixes(config)
-	config.Seal()
-
 	k := keyManager{}
 	err := k.recoveryFromMnemonic(mnemonic, FullPath)
-
 	return &k, err
 }
 
