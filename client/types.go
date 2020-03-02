@@ -1,11 +1,23 @@
 package client
 
-// ABCIQueryOptions can be used to provide options for ABCIQuery call other
-// than the DefaultABCIQueryOptions.
-type ABCIQueryOptions struct {
-	Height int64
-	Prove  bool
-}
+// SyncType is the method type for sending transactions
+type SyncType int
 
-// DefaultABCIQueryOptions are latest height (0) and prove false.
-var DefaultABCIQueryOptions = ABCIQueryOptions{Height: 0, Prove: false}
+const (
+	Async SyncType = iota
+	Sync
+	Commit
+)
+
+// ChainNetwork is the name of the blockchain
+type ChainNetwork uint8
+
+const (
+	TestNetwork ChainNetwork = iota
+	ProdNetwork
+)
+
+const (
+	ProdChainID = "testing"
+	TestChainID = "testing"
+)
