@@ -25,8 +25,6 @@ type KavaClient struct {
 func NewKavaClient(cdc *amino.Codec, mnemonic string, rpcAddr string, networkType ChainNetwork) *KavaClient {
 	// Set up HTTP client
 	http := client.NewHTTP(rpcAddr, "/websocket")
-
-	// TODO: import chain?
 	http.Logger = util.SdkLogger
 
 	// Set up key manager
@@ -42,9 +40,8 @@ func NewKavaClient(cdc *amino.Codec, mnemonic string, rpcAddr string, networkTyp
 	}
 }
 
-// TODO: "options ...tx.Option"
 func (kc *KavaClient) Broadcast(m sdk.Msg, syncType SyncType) (*ctypes.ResultBroadcastTx, error) {
-	signBz, err := kc.sign(m) // TODO: "options..."
+	signBz, err := kc.sign(m)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +74,6 @@ func (kc *KavaClient) Broadcast(m sdk.Msg, syncType SyncType) (*ctypes.ResultBro
 	}
 }
 
-// TODO: options ...tx.Option
 func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 	if kc.Keybase == nil {
 		return nil, fmt.Errorf("Keys are missing, must to set key")
@@ -90,18 +86,14 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 
 	signMsg := &authtypes.StdSignMsg{
 		ChainID:       chainID,
-		AccountNumber: 0, // TODO: -1
+		AccountNumber: 0,
 		Sequence:      0,
 		Fee:           authtypes.NewStdFee(200000, sdk.NewCoins(sdk.NewCoin("ukava", sdk.NewInt(250000)))),
 		Msgs:          []sdk.Msg{m},
 		Memo:          "",
 	}
 
-	// for _, op := range options {
-	// 	signMsg = op(signMsg)
-	// }
-
-	if signMsg.Sequence == 0 || signMsg.AccountNumber == 0 { // TODO: -1
+	if signMsg.Sequence == 0 || signMsg.AccountNumber == 0 {
 		fromAddr := kc.Keybase.GetAddr()
 		acc, err := kc.GetAccount(fromAddr)
 		if err != nil {
@@ -121,9 +113,6 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 			return nil, err
 		}
 	}
-
-	// TODO: remove print
-	fmt.Println("Attempting to sign msg:", *signMsg)
 
 	signedMsg, err := kc.Keybase.Sign(*signMsg)
 	if err != nil {
