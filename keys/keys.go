@@ -23,9 +23,8 @@ import (
 
 const (
 	defaultBIP39Passphrase = ""
-	BIP44Prefix            = "44'/118'/"
+	PartialBIP44Prefix     = "44"
 	PartialPath            = "0'/0/0"
-	FullPath               = BIP44Prefix + PartialPath
 )
 
 // KeyManager is an interface for common methods on KeyManagers
@@ -38,9 +37,12 @@ type KeyManager interface {
 }
 
 // NewMnemonicKeyManager creates a new KeyManager from a mnenomic
-func NewMnemonicKeyManager(mnemonic string) (KeyManager, error) {
+func NewMnemonicKeyManager(mnemonic string, coinID uint32) (KeyManager, error) {
+	fullBIP44Prefix := fmt.Sprintf("%s'/%d'/", PartialBIP44Prefix, coinID)
+	fullPath := fullBIP44Prefix + PartialPath
+
 	k := keyManager{}
-	err := k.recoveryFromMnemonic(mnemonic, FullPath)
+	err := k.recoveryFromMnemonic(mnemonic, fullPath)
 	return &k, err
 }
 

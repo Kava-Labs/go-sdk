@@ -2,11 +2,12 @@ package client
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/binance-chain/bep3-deputy/util"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/tendermint/go-amino"
+	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
@@ -22,13 +23,13 @@ type KavaClient struct {
 }
 
 // NewKavaClient creates a new KavaClient
-func NewKavaClient(cdc *amino.Codec, mnemonic string, rpcAddr string, networkType ChainNetwork) *KavaClient {
+func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr string, networkType ChainNetwork) *KavaClient {
 	// Set up HTTP client
 	http := client.NewHTTP(rpcAddr, "/websocket")
-	http.Logger = util.SdkLogger
+	http.Logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
 	// Set up key manager
-	keyManager, err := keys.NewMnemonicKeyManager(mnemonic)
+	keyManager, err := keys.NewMnemonicKeyManager(mnemonic, coinID)
 	if err != nil {
 		panic(fmt.Sprintf("new key manager from mnenomic err, err=%s", err.Error()))
 	}
