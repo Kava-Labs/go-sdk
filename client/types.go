@@ -18,6 +18,7 @@ const (
 )
 
 const (
-	ProdChainID = "testing"
 	TestChainID = "testing"
+	// ProdChainID is currently set to testnet-5000
+	ProdChainID = "kava-testnet-5000"
 )
