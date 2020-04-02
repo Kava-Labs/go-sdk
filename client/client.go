@@ -80,7 +80,7 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 		return nil, fmt.Errorf("Keys are missing, must to set key")
 	}
 
-	chainID := TestChainID
+	chainID := ProdChainID
 	if kc.Network != ProdNetwork {
 		chainID = TestChainID
 	}
