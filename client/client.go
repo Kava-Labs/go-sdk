@@ -25,7 +25,10 @@ type KavaClient struct {
 // NewKavaClient creates a new KavaClient
 func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr string, networkType ChainNetwork) *KavaClient {
 	// Set up HTTP client
-	http := client.NewHTTP(rpcAddr, "/websocket")
+	http, err := client.NewHTTP(rpcAddr, "/websocket")
+	if err != nil {
+		panic(err)
+	}
 	http.Logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
 	// Set up key manager

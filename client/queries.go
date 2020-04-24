@@ -7,11 +7,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bep3 "github.com/kava-labs/kava/x/bep3/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
 // GetSwapByID gets an atomic swap on Kava by ID
-func (kc *KavaClient) GetSwapByID(swapID cmn.HexBytes) (swap bep3.AtomicSwap, err error) {
+func (kc *KavaClient) GetSwapByID(swapID tmbytes.HexBytes) (swap bep3.AtomicSwap, err error) {
 	params := bep3.NewQueryAtomicSwapByID(swapID)
 	bz, err := kc.Keybase.GetCodec().MarshalJSON(params)
 	if err != nil {
@@ -56,7 +56,7 @@ func (kc *KavaClient) GetAccount(addr sdk.AccAddress) (acc authtypes.BaseAccount
 }
 
 // ABCIQuery sends a query to Kava
-func (kc *KavaClient) ABCIQuery(path string, data cmn.HexBytes) ([]byte, error) {
+func (kc *KavaClient) ABCIQuery(path string, data tmbytes.HexBytes) ([]byte, error) {
 	if err := ValidateABCIQuery(path, data); err != nil {
 		return []byte{}, err
 	}

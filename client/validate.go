@@ -3,7 +3,7 @@ package client
 import (
 	"fmt"
 
-	cmn "github.com/tendermint/tendermint/libs/common"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
@@ -29,7 +29,7 @@ func ValidateTx(tx tmtypes.Tx) error {
 }
 
 // ValidateABCIQuery validates an ABCI query
-func ValidateABCIQuery(path string, data cmn.HexBytes) error {
+func ValidateABCIQuery(path string, data tmbytes.HexBytes) error {
 	if err := ValidateABCIPath(path); err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func ValidateABCIPath(path string) error {
 }
 
 // ValidateABCIData validates an ABCI query's data
-func ValidateABCIData(data cmn.HexBytes) error {
+func ValidateABCIData(data tmbytes.HexBytes) error {
 	if len(data) > maxABCIDataLength {
 		return ExceedABCIPathLengthError
 	}
