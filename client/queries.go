@@ -6,8 +6,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bep3 "github.com/kava-labs/kava/x/bep3/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
+
+	"github.com/kava-labs/go-sdk/types/bep3"
 )
 
 // GetSwapByID gets an atomic swap on Kava by ID
@@ -46,6 +47,9 @@ func (kc *KavaClient) GetAccount(addr sdk.AccAddress) (acc authtypes.BaseAccount
 	if err != nil {
 		return authtypes.BaseAccount{}, err
 	}
+
+	// TODO: UnmarshalJSON isn't working
+	fmt.Println("result:", result)
 
 	err = kc.Keybase.GetCodec().UnmarshalJSON(result, &acc)
 	if err != nil {
