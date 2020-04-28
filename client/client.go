@@ -8,7 +8,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/tendermint/tendermint/rpc/client"
+	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 
@@ -18,14 +18,14 @@ import (
 // KavaClient facilitates interaction with the Kava blockchain
 type KavaClient struct {
 	Network ChainNetwork
-	HTTP    *client.HTTP
+	HTTP    *rpcclient.HTTP
 	Keybase keys.KeyManager
 }
 
 // NewKavaClient creates a new KavaClient
 func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr string, networkType ChainNetwork) *KavaClient {
 	// Set up HTTP client
-	http, err := client.NewHTTP(rpcAddr, "/websocket")
+	http, err := rpcclient.NewHTTP(rpcAddr, "/websocket")
 	if err != nil {
 		panic(err)
 	}
@@ -44,6 +44,7 @@ func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr str
 	}
 }
 
+// Broadcast sends a message to the Kava blockchain as a transaction
 func (kc *KavaClient) Broadcast(m sdk.Msg, syncType SyncType) (*ctypes.ResultBroadcastTx, error) {
 	signBz, err := kc.sign(m)
 	if err != nil {
