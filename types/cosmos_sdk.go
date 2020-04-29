@@ -9,6 +9,14 @@ func NewInt64Coin(denom string, amount int64) sdk.Coin {
 	return sdk.NewInt64Coin(denom, amount)
 }
 
+// Coins is a wrapper around sdk.Coins
+type Coins sdk.Coins
+
+// ToSdk returns sdk.Coins type from a Coins
+func (c Coins) ToSdk() sdk.Coins {
+	return sdk.Coins(c)
+}
+
 // NewCoins is a wrapper around sdk.NewCoins
 func NewCoins(coins ...sdk.Coin) sdk.Coins {
 	return sdk.NewCoins(coins...)
