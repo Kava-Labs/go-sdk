@@ -25,9 +25,15 @@ func NewCoins(coins ...sdk.Coin) sdk.Coins {
 // AccAddress is a wrapper around sdk.AccAddress
 type AccAddress sdk.AccAddress
 
-// ToSdk returns sdk.AccAddress type from an AccAddress
-func (a AccAddress) ToSdk() sdk.AccAddress {
-	return sdk.AccAddress(a)
+// Marshal needed for protobuf compatibility
+func (bz AccAddress) Marshal() ([]byte, error) {
+	return bz, nil
+}
+
+// Unmarshal needed for protobuf compatibility
+func (bz *AccAddress) Unmarshal(data []byte) error {
+	*bz = data
+	return nil
 }
 
 // AccAddressFromBech32 is a wrapper around sdk.AccAddressFromBech32
@@ -37,6 +43,11 @@ func AccAddressFromBech32(address string) (addr AccAddress, err error) {
 		return nil, err
 	}
 	return AccAddress(accAddress), nil
+}
+
+// ToSdk returns sdk.AccAddress type from an AccAddress
+func (a AccAddress) ToSdk() sdk.AccAddress {
+	return sdk.AccAddress(a)
 }
 
 // Tx is a wrapper around sdk.Tx
