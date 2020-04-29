@@ -14,13 +14,16 @@ func NewCoins(coins ...sdk.Coin) sdk.Coins {
 	return sdk.NewCoins(coins...)
 }
 
+// AccAddress is a wrapper around sdk.AccAddress
+type AccAddress sdk.AccAddress
+
 // AccAddressFromBech32 is a wrapper around sdk.AccAddressFromBech32
-func AccAddressFromBech32(address string) (addr sdk.AccAddress, err error) {
+func AccAddressFromBech32(address string) (addr AccAddress, err error) {
 	accAddress, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return nil, err
 	}
-	return accAddress, nil
+	return AccAddress(accAddress), nil
 }
 
 // Tx is a wrapper around sdk.Tx

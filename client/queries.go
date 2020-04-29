@@ -8,6 +8,8 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bep3 "github.com/kava-labs/kava/x/bep3/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+
+	"github.com/kava-labs/go-sdk/types"
 )
 
 // GetSwapByID gets an atomic swap on Kava by ID
@@ -33,14 +35,15 @@ func (kc *KavaClient) GetSwapByID(swapID tmbytes.HexBytes) (swap bep3.AtomicSwap
 }
 
 // GetAccount gets the account associated with an address on Kava
-func (kc *KavaClient) GetAccount(addr sdk.AccAddress) (acc authtypes.BaseAccount, err error) {
-	params := authtypes.NewQueryAccountParams(addr)
+func (kc *KavaClient) GetAccount(addr types.AccAddress) (acc authtypes.BaseAccount, err error) {
+	sdkAddr := sdk.AccAddress(addr)
+	params := authtypes.NewQueryAccountParams(sdkAddr)
 	bz, err := kc.Keybase.GetCodec().MarshalJSON(params)
 	if err != nil {
 		return authtypes.BaseAccount{}, err
 	}
 
-	path := fmt.Sprintf("custom/acc/account/%s", addr.String())
+	path := fmt.Sprintf("custom/acc/account/%s", sdkAddr.String())
 
 	result, err := kc.ABCIQuery(path, bz)
 	if err != nil {
