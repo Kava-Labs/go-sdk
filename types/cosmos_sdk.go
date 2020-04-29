@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
 // NewInt64Coin is a wrapper around sdk.NewInt64Coin
@@ -17,6 +18,11 @@ func NewCoins(coins ...sdk.Coin) sdk.Coins {
 // AccAddress is a wrapper around sdk.AccAddress
 type AccAddress sdk.AccAddress
 
+// ToSdk returns sdk.AccAddress type from an AccAddress
+func (a AccAddress) ToSdk() sdk.AccAddress {
+	return sdk.AccAddress(a)
+}
+
 // AccAddressFromBech32 is a wrapper around sdk.AccAddressFromBech32
 func AccAddressFromBech32(address string) (addr AccAddress, err error) {
 	accAddress, err := sdk.AccAddressFromBech32(address)
@@ -24,6 +30,16 @@ func AccAddressFromBech32(address string) (addr AccAddress, err error) {
 		return nil, err
 	}
 	return AccAddress(accAddress), nil
+}
+
+// SwapByte is a wrapper around tmbytes.HexBytes
+type SwapByte struct {
+	tmbytes.HexBytes
+}
+
+// ToSdk returns tmbytes.HexBytes type from a SwapByte
+func (s SwapByte) ToSdk() {
+	return tmBytes.HexBytes(SwapByte)
 }
 
 // Tx is a wrapper around sdk.Tx
