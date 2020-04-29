@@ -1,8 +1,20 @@
 package types
 
 import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/btcsuite/btcutil/bech32"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/pkg/errors"
 )
+
+const (
+	// KavaPrefix is the address prefix on Kava
+	KavaPrefix = "kava"
+)
+
+// ------------------------- sdk.Coins -------------------------
 
 // NewInt64Coin is a wrapper around sdk.NewInt64Coin
 func NewInt64Coin(denom string, amount int64) sdk.Coin {
@@ -22,8 +34,10 @@ func NewCoins(coins ...sdk.Coin) sdk.Coins {
 	return sdk.NewCoins(coins...)
 }
 
-// AccAddress is a wrapper around sdk.AccAddress
-type AccAddress sdk.AccAddress
+// ----------------------- sdk.AccAddress -----------------------
+
+// AccAddress is a marshalable type convertable to sdk.AccAddress
+type AccAddress []byte
 
 // Marshal needed for protobuf compatibility
 func (bz AccAddress) Marshal() ([]byte, error) {
@@ -36,19 +50,77 @@ func (bz *AccAddress) Unmarshal(data []byte) error {
 	return nil
 }
 
-// AccAddressFromBech32 is a wrapper around sdk.AccAddressFromBech32
+// UnmarshalJSON to Unmarshal from JSON assuming Bech32 encoding
+func (bz *AccAddress) UnmarshalJSON(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return nil
+	}
+
+	bz2, err := AccAddressFromBech32(s)
+	if err != nil {
+		return err
+	}
+	*bz = bz2
+	return nil
+}
+
+// AccAddressFromBech32 to create an AccAddress from a bech32 string
 func AccAddressFromBech32(address string) (addr AccAddress, err error) {
-	accAddress, err := sdk.AccAddressFromBech32(address)
+	bz, err := GetFromBech32(address, KavaPrefix)
 	if err != nil {
 		return nil, err
 	}
-	return AccAddress(accAddress), nil
+	return AccAddress(bz), nil
+}
+
+// GetFromBech32 to decode a bytestring from a bech32-encoded string
+func GetFromBech32(bech32str, prefix string) ([]byte, error) {
+	if len(bech32str) == 0 {
+		return nil, errors.New("decoding bech32 address failed: must provide an address")
+	}
+	hrp, bz, err := DecodeAndConvert(bech32str)
+	if err != nil {
+		return nil, err
+	}
+
+	if hrp != prefix {
+		return nil, fmt.Errorf("invalid bech32 prefix. Expected %s, Got %s", prefix, hrp)
+	}
+
+	return bz, nil
+}
+
+//ConvertAndEncode converts from a base64 encoded byte string to base32 encoded byte string and then to bech32
+func ConvertAndEncode(hrp string, data []byte) (string, error) {
+	converted, err := bech32.ConvertBits(data, 8, 5, true)
+	if err != nil {
+		return "", errors.Wrap(err, "encoding bech32 failed")
+	}
+	return bech32.Encode(hrp, converted)
+
+}
+
+//DecodeAndConvert decodes a bech32 encoded string and converts to base64 encoded bytes
+func DecodeAndConvert(bech string) (string, []byte, error) {
+	hrp, data, err := bech32.Decode(bech)
+	if err != nil {
+		return "", nil, errors.Wrap(err, "decoding bech32 failed")
+	}
+	converted, err := bech32.ConvertBits(data, 5, 8, false)
+	if err != nil {
+		return "", nil, errors.Wrap(err, "decoding bech32 failed")
+	}
+	return hrp, converted, nil
 }
 
 // ToSdk returns sdk.AccAddress type from an AccAddress
-func (a AccAddress) ToSdk() sdk.AccAddress {
-	return sdk.AccAddress(a)
+func (bz AccAddress) ToSdk() sdk.AccAddress {
+	return sdk.AccAddress(bz)
 }
+
+// --------------------------- Other ---------------------------
 
 // Tx is a wrapper around sdk.Tx
 type Tx sdk.Tx
