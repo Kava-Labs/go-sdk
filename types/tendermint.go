@@ -37,6 +37,11 @@ func Sum(data []byte) []byte {
 	return tmhash.Sum(data)
 }
 
+// HexBytes returns tmbytes.HexBytes type from HexBytes
+func (hb HexBytes) ToTendermint() tmbytes.HexBytes {
+	return tmbytes.HexBytes(hb)
+}
+
 // TODO: required?
 type PrivKey interface {
 	crypto.PrivKey
