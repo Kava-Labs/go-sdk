@@ -13,11 +13,18 @@ Kava's Go SDK includes the following components:
 To initialize a new client we'll need to set up the codec and pass it into the constructor
 
 ```go
+// Required imports
+import (
+    "github.com/kava-labs/kava/app"
+    "github.com/kava-labs/go-sdk/types"
+    "github.com/kava-labs/go-sdk/client"
+)
+    
 // Initialize codec with Kava's prefixes and coin type
-config := sdk.GetConfig()
+config := types.GetConfig()
 app.SetBech32AddressPrefixes(config)
 app.SetBip44CoinType(config)
-cdc := app.MakeCodec()
+cdc := types.MakeCodec()
 
 // Initialize new Kava client and set codec
 kavaClient := client.NewKavaClient(cdc, mnemonic, app.Bip44CoinType, rpcAddr, networkTestnet)
@@ -46,6 +53,12 @@ fmt.Println("Account:", acc)
 Client uses the keys package for signing transactions, but keys can also be used standalone. The following example shows how to create a new key manager from a mnemonic phrase
 
 ```go
+// Required imports
+import (
+    "github.com/kava-labs/kava/app"
+    "github.com/kava-labs/go-sdk/keys"
+)
+
 // Create a new mnemonic key manager
 mnemonic := "secret words that unlock your address"
 keybase, err := keys.NewMnemonicKeyManager(mnemonic, app.Bip44CoinType)
