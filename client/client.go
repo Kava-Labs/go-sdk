@@ -101,8 +101,7 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 
 	if signMsg.Sequence == 0 || signMsg.AccountNumber == 0 {
 		fromAddr := kc.Keybase.GetAddr()
-		sdkFromAddr := types.AccAddress(fromAddr)
-		acc, err := kc.GetAccount(sdkFromAddr)
+		acc, err := kc.GetAccount(types.AccAddress(fromAddr))
 		if err != nil {
 			return nil, err
 		}

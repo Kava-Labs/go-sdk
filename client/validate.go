@@ -13,8 +13,8 @@ const (
 )
 
 var (
-	ExceedABCIPathLengthError = fmt.Errorf("the abci path exceed max length %d ", maxABCIPathLength)
-	ExceedABCIDataLengthError = fmt.Errorf("the abci data exceed max length %d ", maxABCIDataLength)
+	ExceedABCIPathLengthError = fmt.Errorf("the abci path exceeds max length %d ", maxABCIPathLength)
+	ExceedABCIDataLengthError = fmt.Errorf("the abci data exceeds max length %d ", maxABCIDataLength)
 )
 
 // ValidateTx validates a Tendermint transaction
