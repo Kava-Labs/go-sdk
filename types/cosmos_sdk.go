@@ -122,9 +122,6 @@ func (bz AccAddress) ToSdk() sdk.AccAddress {
 
 // --------------------------- Other ---------------------------
 
-// Tx is a wrapper around sdk.Tx
-type Tx sdk.Tx
-
 // GetConfig is a wrapper around sdk.GetConfig
 func GetConfig() *sdk.Config {
 	return sdk.GetConfig()
