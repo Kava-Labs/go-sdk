@@ -3,6 +3,7 @@ package types
 import (
 	"github.com/kava-labs/cosmos-sdk/codec"
 	sdk "github.com/kava-labs/cosmos-sdk/types"
+	authtypes "github.com/kava-labs/cosmos-sdk/x/auth/types"
 	"github.com/kava-labs/cosmos-sdk/x/auth/vesting"
 
 	// "github.com/kava-labs/kava/app"
@@ -31,8 +32,8 @@ func MakeCodec() *codec.Codec {
 	Cdc = codec.New()
 
 	// Register Kava app
-	// TODO: app.ModuleBasics.RegisterCodec(Cdc)
-
+	// app.ModuleBasics.RegisterCodec(Cdc)
+	authtypes.RegisterCodec(Cdc)
 	vesting.RegisterCodec(Cdc)
 	sdk.RegisterCodec(Cdc)
 	codec.RegisterCrypto(Cdc)

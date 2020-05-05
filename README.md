@@ -70,6 +70,6 @@ if err != nil {
 ## Version compatibility
 
 We recommend using the Go SDK with the following versions of relevant software:
-- github.com/cosmos/cosmos-sdk v0.38.3
-- github.com/tendermint/tendermint v0.33.3
+- github.com/kava-labs/cosmos-sdk v0.34.4-0.20200505055524-c0acebc54d70
+- github.com/kava-labs/tendermint v0.33.4-0.20200505050845-6c848ee6dc48
 - github.com/kava-labs/kava v0.7.1-0.20200424154444-e9a73b80ce91

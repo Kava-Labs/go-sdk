@@ -5,6 +5,7 @@ import (
 
 	binanceKeys "github.com/binance-chain/go-sdk/keys"
 
+	sdk "github.com/kava-labs/cosmos-sdk/types"
 	"github.com/kava-labs/go-sdk/client"
 	"github.com/kava-labs/go-sdk/types"
 )
@@ -34,6 +35,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("addr:", sdk.AccAddress(addr).String())
 
 	// TODO: Won't work until we call RegisterCodec for kava app's ModuleBasics,
 	//		 but kava/app will import from tendermint/tendermint and cosmos/cosmos-sdk
