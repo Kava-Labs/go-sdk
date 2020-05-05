@@ -13,7 +13,6 @@ import (
 	"github.com/tendermint/go-amino"
 
 	"github.com/kava-labs/go-sdk/keys"
-	"github.com/kava-labs/go-sdk/types"
 )
 
 // KavaClient facilitates interaction with the Kava blockchain
@@ -101,7 +100,7 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 
 	if signMsg.Sequence == 0 || signMsg.AccountNumber == 0 {
 		fromAddr := kc.Keybase.GetAddr()
-		acc, err := kc.GetAccount(types.AccAddress(fromAddr))
+		acc, err := kc.GetAccount(fromAddr)
 		if err != nil {
 			return nil, err
 		}
