@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	binanceKeys "github.com/binance-chain/go-sdk/keys"
+
 	"github.com/kava-labs/go-sdk/client"
 	"github.com/kava-labs/go-sdk/types"
 )
@@ -15,6 +17,9 @@ const (
 )
 
 func main() {
+
+	bip44Params := binanceKeys.NewBinanceBIP44Params(0, 0)
+	fmt.Println("bip44Params:", bip44Params)
 
 	// Set up Kava app and initialize codec
 	config := types.GetConfig()

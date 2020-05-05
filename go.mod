@@ -3,6 +3,7 @@ module github.com/kava-labs/go-sdk
 go 1.13
 
 require (
+	github.com/binance-chain/go-sdk v1.2.2 // indirect
 	github.com/btcsuite/btcd v0.20.1-beta
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d
