@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	"github.com/btcsuite/btcutil/bech32"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/kava-labs/cosmos-sdk/types"
+	authtypes "github.com/kava-labs/cosmos-sdk/x/auth/types"
 	"github.com/pkg/errors"
 )
 
@@ -119,6 +120,19 @@ func DecodeAndConvert(bech string) (string, []byte, error) {
 func (bz AccAddress) ToSdk() sdk.AccAddress {
 	return sdk.AccAddress(bz)
 }
+
+// ----------------------- sdk.StdSignature -----------------------
+
+// StdSignature represents a sig
+type StdSignature struct {
+	authtypes.StdSignature
+	// crypto.PubKey `json:"pub_key" yaml:"pub_key"` // optional
+	// Signature     []byte                          `json:"signature" yaml:"signature"`
+}
+
+// TODO: func (std StdSignature) ToSdk() authtypes.StdSignature {
+// 	return authtypes.StdSignature(std)
+// }
 
 // --------------------------- Other ---------------------------
 

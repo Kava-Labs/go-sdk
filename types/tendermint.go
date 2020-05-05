@@ -1,9 +1,9 @@
 package types
 
 import (
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/kava-labs/tendermint/crypto/tmhash"
+	tmbytes "github.com/kava-labs/tendermint/libs/bytes"
+	"github.com/kava-labs/tendermint/libs/log"
 )
 
 // --------------------------- Logger ---------------------------

@@ -3,8 +3,8 @@ package client
 import (
 	"fmt"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	tmtypes "github.com/tendermint/tendermint/types"
+	tmbytes "github.com/kava-labs/tendermint/libs/bytes"
+	tmtypes "github.com/kava-labs/tendermint/types"
 )
 
 const (
