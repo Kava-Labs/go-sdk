@@ -16,3 +16,9 @@ require (
 )
 
 replace github.com/zondax/ledger-go => github.com/binance-chain/ledger-go v0.9.1
+
+replace github.com/tendermint/tendermint => github.com/kava-labs/tendermint v0.33.4-0.20200505050845-6c848ee6dc48
+
+replace github.com/tendermint/iavl => github.com/kava-labs/iavl v0.13.4-0.20200505052424-c6437f617584
+
+replace github.com/cosmos/cosmos-sdk => github.com/kava-labs/cosmos-sdk v0.34.4-0.20200505055524-c0acebc54d70
