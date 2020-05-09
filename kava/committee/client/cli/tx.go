@@ -20,7 +20,7 @@ import (
 	"github.com/kava-labs/tendermint/crypto"
 	"github.com/spf13/cobra"
 
-	types "github.com/kava-labs/go-sdk/kava/types/committee"
+	types "github.com/kava-labs/go-sdk/kava/committee"
 )
 
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {

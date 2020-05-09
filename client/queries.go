@@ -8,27 +8,27 @@ import (
 	authtypes "github.com/kava-labs/cosmos-sdk/x/auth/types"
 	tmbytes "github.com/kava-labs/tendermint/libs/bytes"
 
-	"github.com/kava-labs/go-sdk/kava/types"
+	"github.com/kava-labs/go-sdk/kava/bep3"
 )
 
 // GetSwapByID gets an atomic swap on Kava by ID
-func (kc *KavaClient) GetSwapByID(swapID tmbytes.HexBytes) (swap types.AtomicSwap, err error) {
-	params := types.NewQueryAtomicSwapByID(swapID)
+func (kc *KavaClient) GetSwapByID(swapID tmbytes.HexBytes) (swap bep3.AtomicSwap, err error) {
+	params := bep3.NewQueryAtomicSwapByID(swapID)
 	bz, err := kc.Keybase.GetCodec().MarshalJSON(params)
 	if err != nil {
-		return types.AtomicSwap{}, err
+		return bep3.AtomicSwap{}, err
 	}
 
 	path := "custom/bep3/swap"
 
 	result, err := kc.ABCIQuery(path, bz)
 	if err != nil {
-		return types.AtomicSwap{}, err
+		return bep3.AtomicSwap{}, err
 	}
 
 	err = kc.Keybase.GetCodec().UnmarshalJSON(result, &swap)
 	if err != nil {
-		return types.AtomicSwap{}, err
+		return bep3.AtomicSwap{}, err
 	}
 	return swap, nil
 }

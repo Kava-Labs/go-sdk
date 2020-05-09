@@ -22,15 +22,15 @@ import (
 	"github.com/kava-labs/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/kava-labs/cosmos-sdk/x/upgrade/client"
 
-	"github.com/kava-labs/go-sdk/kava/types/auction"
-	"github.com/kava-labs/go-sdk/kava/types/bep3"
-	"github.com/kava-labs/go-sdk/kava/types/cdp"
-	"github.com/kava-labs/go-sdk/kava/types/committee"
-	commclient "github.com/kava-labs/go-sdk/kava/types/committee/client"
-	"github.com/kava-labs/go-sdk/kava/types/incentive"
-	"github.com/kava-labs/go-sdk/kava/types/kavadist"
-	"github.com/kava-labs/go-sdk/kava/types/pricefeed"
-	"github.com/kava-labs/go-sdk/kava/types/validatorvesting"
+	"github.com/kava-labs/go-sdk/kava/auction"
+	"github.com/kava-labs/go-sdk/kava/bep3"
+	"github.com/kava-labs/go-sdk/kava/cdp"
+	"github.com/kava-labs/go-sdk/kava/committee"
+	commclient "github.com/kava-labs/go-sdk/kava/committee/client"
+	"github.com/kava-labs/go-sdk/kava/incentive"
+	"github.com/kava-labs/go-sdk/kava/kavadist"
+	"github.com/kava-labs/go-sdk/kava/pricefeed"
+	"github.com/kava-labs/go-sdk/kava/validatorvesting"
 )
 
 const (
@@ -38,16 +38,7 @@ const (
 	Bip44CoinType    = 459
 )
 
-// var (
-// 	_ module.AppModule           = AppModule{}
-// 	_ module.AppModuleBasic      = AppModuleBasic{}
-// 	_ module.AppModuleSimulation = AppModule{}
-// )
-
 // --------------------------- Codec ---------------------------
-
-// Cdc is the global app codec
-// var Cdc *codec.Codec
 
 // MakeCodec registers Kava app and locally defined txs/msgs
 func MakeCodec() *codec.Codec {
