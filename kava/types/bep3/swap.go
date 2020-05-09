@@ -1,4 +1,4 @@
-package types
+package bep3
 
 import (
 	"encoding/hex"
@@ -7,9 +7,6 @@ import (
 
 	sdk "github.com/kava-labs/cosmos-sdk/types"
 	tmbytes "github.com/kava-labs/tendermint/libs/bytes"
-
-	"github.com/kava-labs/go-sdk/kava"
-	"github.com/kava-labs/go-sdk/kava/msgs"
 )
 
 // AtomicSwap contains the information for an atomic swap
@@ -50,7 +47,7 @@ func NewAtomicSwap(amount sdk.Coins, randomNumberHash tmbytes.HexBytes, expireHe
 
 // GetSwapID calculates the ID of an atomic swap
 func (a AtomicSwap) GetSwapID() tmbytes.HexBytes {
-	return kava.CalculateSwapID(a.RandomNumberHash, a.Sender, a.SenderOtherChain)
+	return CalculateSwapID(a.RandomNumberHash, a.Sender, a.SenderOtherChain)
 }
 
 // GetCoins returns the swap's amount as sdk.Coins
@@ -60,14 +57,14 @@ func (a AtomicSwap) GetCoins() sdk.Coins {
 
 // Validate verifies that recipient is not empty
 func (a AtomicSwap) Validate() error {
-	if len(a.Sender) != msgs.AddrByteCount {
-		return fmt.Errorf(fmt.Sprintf("the expected address length is %d, actual length is %d", msgs.AddrByteCount, len(a.Sender)))
+	if len(a.Sender) != AddrByteCount {
+		return fmt.Errorf(fmt.Sprintf("the expected address length is %d, actual length is %d", AddrByteCount, len(a.Sender)))
 	}
-	if len(a.Recipient) != msgs.AddrByteCount {
-		return fmt.Errorf(fmt.Sprintf("the expected address length is %d, actual length is %d", msgs.AddrByteCount, len(a.Recipient)))
+	if len(a.Recipient) != AddrByteCount {
+		return fmt.Errorf(fmt.Sprintf("the expected address length is %d, actual length is %d", AddrByteCount, len(a.Recipient)))
 	}
-	if len(a.RandomNumberHash) != msgs.RandomNumberHashLength {
-		return fmt.Errorf(fmt.Sprintf("the length of random number hash should be %d", msgs.RandomNumberHashLength))
+	if len(a.RandomNumberHash) != RandomNumberHashLength {
+		return fmt.Errorf(fmt.Sprintf("the length of random number hash should be %d", RandomNumberHashLength))
 	}
 	if !a.Amount.IsAllPositive() {
 		return fmt.Errorf(fmt.Sprintf("the swapped out coin must be positive"))
