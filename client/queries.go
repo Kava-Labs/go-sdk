@@ -4,30 +4,31 @@ import (
 	"errors"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bep3 "github.com/kava-labs/kava/x/bep3/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
+	sdk "github.com/kava-labs/cosmos-sdk/types"
+	authtypes "github.com/kava-labs/cosmos-sdk/x/auth/types"
+	tmbytes "github.com/kava-labs/tendermint/libs/bytes"
+
+	"github.com/kava-labs/go-sdk/kava/types"
 )
 
 // GetSwapByID gets an atomic swap on Kava by ID
-func (kc *KavaClient) GetSwapByID(swapID cmn.HexBytes) (swap bep3.AtomicSwap, err error) {
-	params := bep3.NewQueryAtomicSwapByID(swapID)
+func (kc *KavaClient) GetSwapByID(swapID tmbytes.HexBytes) (swap types.AtomicSwap, err error) {
+	params := types.NewQueryAtomicSwapByID(swapID)
 	bz, err := kc.Keybase.GetCodec().MarshalJSON(params)
 	if err != nil {
-		return bep3.AtomicSwap{}, err
+		return types.AtomicSwap{}, err
 	}
 
 	path := "custom/bep3/swap"
 
 	result, err := kc.ABCIQuery(path, bz)
 	if err != nil {
-		return bep3.AtomicSwap{}, err
+		return types.AtomicSwap{}, err
 	}
 
 	err = kc.Keybase.GetCodec().UnmarshalJSON(result, &swap)
 	if err != nil {
-		return bep3.AtomicSwap{}, err
+		return types.AtomicSwap{}, err
 	}
 	return swap, nil
 }
@@ -56,7 +57,7 @@ func (kc *KavaClient) GetAccount(addr sdk.AccAddress) (acc authtypes.BaseAccount
 }
 
 // ABCIQuery sends a query to Kava
-func (kc *KavaClient) ABCIQuery(path string, data cmn.HexBytes) ([]byte, error) {
+func (kc *KavaClient) ABCIQuery(path string, data tmbytes.HexBytes) ([]byte, error) {
 	if err := ValidateABCIQuery(path, data); err != nil {
 		return []byte{}, err
 	}
