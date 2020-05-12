@@ -1,4 +1,4 @@
-package types
+package bep3
 
 import (
 	tmbytes "github.com/kava-labs/tendermint/libs/bytes"

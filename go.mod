@@ -9,10 +9,12 @@ require (
 	github.com/kava-labs/cosmos-sdk v0.34.4-0.20200506043356-5d772797f9a3
 	github.com/kava-labs/tendermint v0.33.4-0.20200506042050-c611c5308a53
 	github.com/pkg/errors v0.9.1
+	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.5.1
 	github.com/stumble/gorocksdb v0.0.3 // indirect
 	github.com/tendermint/go-amino v0.15.1
 	github.com/zondax/ledger-go v0.11.0 // indirect
+	gopkg.in/yaml.v2 v2.2.8
 )
 
 replace github.com/zondax/ledger-go => github.com/binance-chain/ledger-go v0.9.1

@@ -1,19 +1,17 @@
-package msgs
+package bep3
 
 import (
 	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/kava-labs/tendermint/crypto"
-	tmbytes "github.com/kava-labs/tendermint/libs/bytes"
-
 	sdk "github.com/kava-labs/cosmos-sdk/types"
 	sdkerrors "github.com/kava-labs/cosmos-sdk/types/errors"
+	"github.com/kava-labs/tendermint/crypto"
+	tmbytes "github.com/kava-labs/tendermint/libs/bytes"
 )
 
 const (
-	ModuleName       = "bep3"
 	CreateAtomicSwap = "createAtomicSwap"
 	ClaimAtomicSwap  = "claimAtomicSwap"
 	RefundAtomicSwap = "refundAtomicSwap"
@@ -71,7 +69,7 @@ func NewMsgCreateAtomicSwap(from sdk.AccAddress, to sdk.AccAddress, recipientOth
 }
 
 // Route establishes the route for the MsgCreateAtomicSwap
-func (msg MsgCreateAtomicSwap) Route() string { return ModuleName }
+func (msg MsgCreateAtomicSwap) Route() string { return RouterKey }
 
 // Type is the name of MsgCreateAtomicSwap
 func (msg MsgCreateAtomicSwap) Type() string { return CreateAtomicSwap }
@@ -153,7 +151,7 @@ func (msg MsgCreateAtomicSwap) ValidateBasic() error {
 
 // GetSignBytes gets the sign bytes of a MsgCreateAtomicSwap
 func (msg MsgCreateAtomicSwap) GetSignBytes() []byte {
-	bz := MsgCdc.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
@@ -174,7 +172,7 @@ func NewMsgClaimAtomicSwap(from sdk.AccAddress, swapID, randomNumber []byte) Msg
 }
 
 // Route establishes the route for the MsgClaimAtomicSwap
-func (msg MsgClaimAtomicSwap) Route() string { return ModuleName }
+func (msg MsgClaimAtomicSwap) Route() string { return RouterKey }
 
 // Type is the name of MsgClaimAtomicSwap
 func (msg MsgClaimAtomicSwap) Type() string { return ClaimAtomicSwap }
@@ -213,7 +211,7 @@ func (msg MsgClaimAtomicSwap) ValidateBasic() error {
 
 // GetSignBytes gets the sign bytes of a MsgClaimAtomicSwap
 func (msg MsgClaimAtomicSwap) GetSignBytes() []byte {
-	bz := MsgCdc.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
@@ -232,7 +230,7 @@ func NewMsgRefundAtomicSwap(from sdk.AccAddress, swapID []byte) MsgRefundAtomicS
 }
 
 // Route establishes the route for the MsgRefundAtomicSwap
-func (msg MsgRefundAtomicSwap) Route() string { return ModuleName }
+func (msg MsgRefundAtomicSwap) Route() string { return RouterKey }
 
 // Type is the name of MsgRefundAtomicSwap
 func (msg MsgRefundAtomicSwap) Type() string { return RefundAtomicSwap }
@@ -268,6 +266,6 @@ func (msg MsgRefundAtomicSwap) ValidateBasic() error {
 
 // GetSignBytes gets the sign bytes of a MsgRefundAtomicSwap
 func (msg MsgRefundAtomicSwap) GetSignBytes() []byte {
-	bz := MsgCdc.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }

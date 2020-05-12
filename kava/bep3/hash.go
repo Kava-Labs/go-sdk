@@ -1,4 +1,4 @@
-package kava
+package bep3
 
 import (
 	"crypto/rand"
@@ -9,8 +9,6 @@ import (
 
 	sdk "github.com/kava-labs/cosmos-sdk/types"
 	"github.com/kava-labs/tendermint/crypto/tmhash"
-
-	"github.com/kava-labs/go-sdk/kava/msgs"
 )
 
 // GenerateSecureRandomNumber generates cryptographically strong pseudo-random number
@@ -34,9 +32,9 @@ func GenerateSecureRandomNumber() (*big.Int, error) {
 
 // CalculateRandomHash calculates the hash of a number and timestamp
 func CalculateRandomHash(randomNumber []byte, timestamp int64) []byte {
-	data := make([]byte, msgs.RandomNumberLength+msgs.Int64Size)
-	copy(data[:msgs.RandomNumberLength], randomNumber)
-	binary.BigEndian.PutUint64(data[msgs.RandomNumberLength:], uint64(timestamp))
+	data := make([]byte, RandomNumberLength+Int64Size)
+	copy(data[:RandomNumberLength], randomNumber)
+	binary.BigEndian.PutUint64(data[RandomNumberLength:], uint64(timestamp))
 	return tmhash.Sum(data)
 }
 
