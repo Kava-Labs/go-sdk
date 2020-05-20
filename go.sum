@@ -143,6 +143,7 @@ github.com/golang/protobuf v1.3.0/go.mod h1:Qd/q+1AKNOZr9uGQzbzCmRO6sUih6GTPZv6a
 github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.3.2/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.3.3/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaWz5lYuqw=
+github.com/golang/protobuf v1.3.4 h1:87PNWwrRvUSnqS4dlcBU/ftvOIBep4sYuBLlh6rX2wk=
 github.com/golang/protobuf v1.3.4/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaWz5lYuqw=
 github.com/golang/protobuf v1.4.0-rc.1/go.mod h1:ceaxUfeHdC40wWswd/P6IGgMaK3YpKi5j83Wpe3EHw8=
 github.com/golang/protobuf v1.4.0-rc.1.0.20200221234624-67d41d38c208/go.mod h1:xKAWHe0F5eneWXFV3EuXVDTCmh+JuBKY0li0aMyXATA=
@@ -227,12 +228,12 @@ github.com/json-iterator/go v1.1.8/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/u
 github.com/json-iterator/go v1.1.9/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
 github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
-github.com/kava-labs/cosmos-sdk v0.38.3-stable.0.20200520051739-23f8dbbdd050 h1:CqsQ13gpD3+zJ4FPsH5zmvc2leIM+7+SESMf9IsIJ8A=
-github.com/kava-labs/cosmos-sdk v0.38.3-stable.0.20200520051739-23f8dbbdd050/go.mod h1:42wZaUUj4MZpHpWeSDydJhImzwltl3kkR5ogQoyoZrM=
-github.com/kava-labs/iavl v0.13.4-0.20200520051231-a96e07711757 h1:pgx/sLQ+8wWXSj/dQh7ogmioRYyu4GV+1VhJHUh8zJQ=
-github.com/kava-labs/iavl v0.13.4-0.20200520051231-a96e07711757/go.mod h1:LhzCB+6t9Xl3N5Mf0glujnvNX09BUnw480gmtohrmDo=
-github.com/kava-labs/tendermint v0.33.4-0.20200520050724-b26f703498c9 h1:p0K7SOftAURcqpm+sTZ+d8zG2QT36aGf03DmGzHRMLc=
-github.com/kava-labs/tendermint v0.33.4-0.20200520050724-b26f703498c9/go.mod h1:bQH35Apltdjh3SfnBgqNsrfWpEkP7QIO71JCM9VjXfs=
+github.com/kava-labs/cosmos-sdk v0.38.3-stable.0.20200520165813-1b912ba63bad h1:cETbkqLaSvbM0PmxG5YX4RhS2+ZazfMIjuvgBV2Y63Y=
+github.com/kava-labs/cosmos-sdk v0.38.3-stable.0.20200520165813-1b912ba63bad/go.mod h1:CzRLXxexxuKgMJ1P4R9cHMk5KiGANgSNUMv02ZgLduQ=
+github.com/kava-labs/iavl v0.13.4-0.20200520164545-88a15b563d3d h1:pZzCTWtYowkxak+4e4XQGthdpA8XjchskSyfJKkG70U=
+github.com/kava-labs/iavl v0.13.4-0.20200520164545-88a15b563d3d/go.mod h1:VLoBw5db5y2idTscFjf+edtk5ddLGrCRH6M/948/FCE=
+github.com/kava-labs/tendermint v0.33.4-0.20200520164040-22a423c4e84a h1:WFe56rJWYaTmZ6c9DdtS5ZKs1c9Jd8jSe7QlVtUJYJY=
+github.com/kava-labs/tendermint v0.33.4-0.20200520164040-22a423c4e84a/go.mod h1:bQH35Apltdjh3SfnBgqNsrfWpEkP7QIO71JCM9VjXfs=
 github.com/kava-labs/tm-db v0.4.1-stable h1:yGn7r+cd58oSQ7DyVXlckiFOImEMOkqfxQSAjfnEfrk=
 github.com/kava-labs/tm-db v0.4.1-stable/go.mod h1:dRComvpd8Xj0cJun86vy2bc1i5b8gm15dQlRm1+BiMs=
 github.com/keybase/go-keychain v0.0.0-20190712205309-48d3d31d256d h1:Z+RDyXzjKE0i2sTjZ/b1uxiGtPhFy34Ou/Tk0qwN0kM=
