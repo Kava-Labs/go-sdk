@@ -371,15 +371,16 @@ func (acps AllowedCollateralParams) Allows(current, incoming cdptypes.Collateral
 }
 
 type AllowedCollateralParam struct {
-	Denom              string `json:"denom" yaml:"denom"`
-	LiquidationRatio   bool   `json:"liquidation_ratio" yaml:"liquidation_ratio"`
-	DebtLimit          bool   `json:"debt_limit" yaml:"debt_limit"`
-	StabilityFee       bool   `json:"stability_fee" yaml:"stability_fee"`
-	AuctionSize        bool   `json:"auction_size" yaml:"auction_size"`
-	LiquidationPenalty bool   `json:"liquidation_penalty" yaml:"liquidation_penalty"`
-	Prefix             bool   `json:"prefix" yaml:"prefix"`
-	MarketID           bool   `json:"market_id" yaml:"market_id"`
-	ConversionFactor   bool   `json:"conversion_factor" yaml:"conversion_factor"`
+	Denom               string `json:"denom" yaml:"denom"`
+	LiquidationRatio    bool   `json:"liquidation_ratio" yaml:"liquidation_ratio"`
+	DebtLimit           bool   `json:"debt_limit" yaml:"debt_limit"`
+	StabilityFee        bool   `json:"stability_fee" yaml:"stability_fee"`
+	AuctionSize         bool   `json:"auction_size" yaml:"auction_size"`
+	LiquidationPenalty  bool   `json:"liquidation_penalty" yaml:"liquidation_penalty"`
+	Prefix              bool   `json:"prefix" yaml:"prefix"`
+	SpotMarketID        bool   `json:"market_id" yaml:"market_id"`
+	LiquidationMarketID bool   `json:"market_id" yaml:"market_id"`
+	ConversionFactor    bool   `json:"conversion_factor" yaml:"conversion_factor"`
 }
 
 func (acp AllowedCollateralParam) Allows(current, incoming cdptypes.CollateralParam) bool {
@@ -390,7 +391,8 @@ func (acp AllowedCollateralParam) Allows(current, incoming cdptypes.CollateralPa
 		(current.AuctionSize.Equal(incoming.AuctionSize) || acp.AuctionSize) &&
 		(current.LiquidationPenalty.Equal(incoming.LiquidationPenalty) || acp.LiquidationPenalty) &&
 		((current.Prefix == incoming.Prefix) || acp.Prefix) &&
-		((current.MarketID == incoming.MarketID) || acp.MarketID) &&
+		((current.SpotMarketID == incoming.SpotMarketID) || acp.SpotMarketID) &&
+		((current.LiquidationMarketID == incoming.LiquidationMarketID) || acp.LiquidationMarketID) &&
 		(current.ConversionFactor.Equal(incoming.ConversionFactor) || acp.ConversionFactor)
 	return allowed
 }
