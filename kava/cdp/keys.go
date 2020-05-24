@@ -15,4 +15,24 @@ const (
 
 	// DefaultParamspace default name for parameter store
 	DefaultParamspace = ModuleName
+
+	// LiquidatorMacc module account for liquidator
+	LiquidatorMacc = "liquidator"
+
+	// SavingsRateMacc module account for savings rate
+	SavingsRateMacc = "savings"
+)
+
+// KVStore key prefixes
+var (
+	CdpIDKeyPrefix              = []byte{0x00}
+	CdpKeyPrefix                = []byte{0x01}
+	CollateralRatioIndexPrefix  = []byte{0x02}
+	CdpIDKey                    = []byte{0x03}
+	DebtDenomKey                = []byte{0x04}
+	GovDenomKey                 = []byte{0x05}
+	DepositKeyPrefix            = []byte{0x06}
+	PrincipalKeyPrefix          = []byte{0x07}
+	PreviousDistributionTimeKey = []byte{0x08}
+	PricefeedStatusKeyPrefix    = []byte{0x09}
 )
