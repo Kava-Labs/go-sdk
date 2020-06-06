@@ -22,7 +22,7 @@ const (
 	// LocalChainID is for local development
 	LocalChainID = "testing"
 	// TestChainID is Kava's latest testnet
-	TestChainID = "kava-testnet-6000"
+	TestChainID = "kava-3-testnet"
 	// ProdChainID is Kava's mainnet
 	ProdChainID = "kava-3"
 )
