@@ -4,10 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bep3 "github.com/kava-labs/kava/x/bep3/types"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	sdk "github.com/kava-labs/cosmos-sdk/types"
+	authtypes "github.com/kava-labs/cosmos-sdk/x/auth/types"
+	tmbytes "github.com/kava-labs/tendermint/libs/bytes"
+
+	"github.com/kava-labs/go-sdk/kava/bep3"
 )
 
 // GetSwapByID gets an atomic swap on Kava by ID

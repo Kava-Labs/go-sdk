@@ -13,12 +13,16 @@ const (
 type ChainNetwork uint8
 
 const (
-	TestNetwork ChainNetwork = iota
+	LocalNetwork ChainNetwork = iota
+	TestNetwork
 	ProdNetwork
 )
 
 const (
-	TestChainID = "testing"
-	// ProdChainID is currently set to testnet-5000
-	ProdChainID = "kava-testnet-5000"
+	// LocalChainID is for local development
+	LocalChainID = "testing"
+	// TestChainID is Kava's latest testnet
+	TestChainID = "kava-testnet-6000"
+	// ProdChainID is Kava's mainnet
+	ProdChainID = "kava-3"
 )

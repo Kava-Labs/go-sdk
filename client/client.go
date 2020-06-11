@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	sdk "github.com/kava-labs/cosmos-sdk/types"
+	authtypes "github.com/kava-labs/cosmos-sdk/x/auth/types"
+	"github.com/kava-labs/tendermint/libs/log"
+	rpcclient "github.com/kava-labs/tendermint/rpc/client"
+	ctypes "github.com/kava-labs/tendermint/rpc/core/types"
+	tmtypes "github.com/kava-labs/tendermint/types"
 	"github.com/tendermint/go-amino"
-	"github.com/tendermint/tendermint/libs/log"
-	"github.com/tendermint/tendermint/rpc/client"
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/kava-labs/go-sdk/keys"
 )
@@ -18,14 +18,14 @@ import (
 // KavaClient facilitates interaction with the Kava blockchain
 type KavaClient struct {
 	Network ChainNetwork
-	HTTP    *client.HTTP
+	HTTP    *rpcclient.HTTP
 	Keybase keys.KeyManager
 }
 
 // NewKavaClient creates a new KavaClient
 func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr string, networkType ChainNetwork) *KavaClient {
 	// Set up HTTP client
-	http, err := client.NewHTTP(rpcAddr, "/websocket")
+	http, err := rpcclient.NewHTTP(rpcAddr, "/websocket")
 	if err != nil {
 		panic(err)
 	}
@@ -44,6 +44,7 @@ func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr str
 	}
 }
 
+// Broadcast sends a message to the Kava blockchain as a transaction
 func (kc *KavaClient) Broadcast(m sdk.Msg, syncType SyncType) (*ctypes.ResultBroadcastTx, error) {
 	signBz, err := kc.sign(m)
 	if err != nil {
@@ -83,9 +84,14 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 		return nil, fmt.Errorf("Keys are missing, must to set key")
 	}
 
-	chainID := ProdChainID
-	if kc.Network != ProdNetwork {
+	var chainID string
+	switch kc.Network {
+	case LocalNetwork:
+		chainID = LocalChainID
+	case TestNetwork:
 		chainID = TestChainID
+	case ProdNetwork:
+		chainID = ProdChainID
 	}
 
 	signMsg := &authtypes.StdSignMsg{
