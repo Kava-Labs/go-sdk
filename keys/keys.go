@@ -12,9 +12,9 @@ import (
 	"strings"
 
 	"github.com/btcsuite/btcd/btcec"
+	"github.com/cosmos/go-bip39"
 	sdk "github.com/kava-labs/cosmos-sdk/types"
 	authtypes "github.com/kava-labs/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/go-bip39"
 
 	"github.com/kava-labs/tendermint/crypto"
 	"github.com/kava-labs/tendermint/crypto/secp256k1"
@@ -31,9 +31,7 @@ const (
 type KeyManager interface {
 	GetPrivKey() crypto.PrivKey
 	GetAddr() sdk.AccAddress
-	GetCodec() *amino.Codec
-	SetCodec(*amino.Codec)
-	Sign(authtypes.StdSignMsg) ([]byte, error)
+	Sign(authtypes.StdSignMsg, *amino.Codec) ([]byte, error)
 }
 
 // NewMnemonicKeyManager creates a new KeyManager from a mnenomic
@@ -54,7 +52,6 @@ func NewPrivateKeyManager(priKey string) (KeyManager, error) {
 }
 
 type keyManager struct {
-	cdc      *amino.Codec
 	privKey  crypto.PrivKey
 	addr     sdk.AccAddress
 	mnemonic string
@@ -68,16 +65,8 @@ func (m *keyManager) GetAddr() sdk.AccAddress {
 	return m.addr
 }
 
-func (m *keyManager) GetCodec() *amino.Codec {
-	return m.cdc
-}
-
-func (m *keyManager) SetCodec(codec *amino.Codec) {
-	m.cdc = codec
-}
-
 // Sign signs a standard msg and marshals the result to bytes
-func (m *keyManager) Sign(stdMsg authtypes.StdSignMsg) ([]byte, error) {
+func (m *keyManager) Sign(stdMsg authtypes.StdSignMsg, cdc *amino.Codec) ([]byte, error) {
 	sig, err := m.makeSignature(stdMsg)
 	if err != nil {
 		return nil, err
@@ -85,7 +74,7 @@ func (m *keyManager) Sign(stdMsg authtypes.StdSignMsg) ([]byte, error) {
 
 	newTx := authtypes.NewStdTx(stdMsg.Msgs, stdMsg.Fee, []authtypes.StdSignature{sig}, stdMsg.Memo)
 
-	bz, err := m.cdc.MarshalBinaryLengthPrefixed(&newTx)
+	bz, err := cdc.MarshalBinaryLengthPrefixed(&newTx)
 	if err != nil {
 		return nil, err
 	}
