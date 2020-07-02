@@ -100,7 +100,7 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 		ChainID:       chainID,
 		AccountNumber: 0,
 		Sequence:      0,
-		Fee:           authtypes.NewStdFee(200000, sdk.NewCoins(sdk.NewCoin("ukava", sdk.NewInt(250000)))),
+		Fee:           authtypes.NewStdFee(250000, nil),
 		Msgs:          []sdk.Msg{m},
 		Memo:          "",
 	}
