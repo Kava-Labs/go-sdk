@@ -20,6 +20,7 @@ type KavaClient struct {
 	Network ChainNetwork
 	HTTP    *rpcclient.HTTP
 	Keybase keys.KeyManager
+	Cdc     *amino.Codec
 }
 
 // NewKavaClient creates a new KavaClient
@@ -41,6 +42,7 @@ func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr str
 		Network: networkType,
 		HTTP:    http,
 		Keybase: keyManager,
+		Cdc:     cdc,
 	}
 }
 
@@ -124,7 +126,7 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 		}
 	}
 
-	signedMsg, err := kc.Keybase.Sign(*signMsg)
+	signedMsg, err := kc.Keybase.Sign(*signMsg, kc.Cdc)
 	if err != nil {
 		return nil, err
 	}

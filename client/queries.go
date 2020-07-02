@@ -14,7 +14,7 @@ import (
 // GetSwapByID gets an atomic swap on Kava by ID
 func (kc *KavaClient) GetSwapByID(swapID tmbytes.HexBytes) (swap bep3.AtomicSwap, err error) {
 	params := bep3.NewQueryAtomicSwapByID(swapID)
-	bz, err := kc.Keybase.GetCodec().MarshalJSON(params)
+	bz, err := kc.Cdc.MarshalJSON(params)
 	if err != nil {
 		return bep3.AtomicSwap{}, err
 	}
@@ -26,7 +26,7 @@ func (kc *KavaClient) GetSwapByID(swapID tmbytes.HexBytes) (swap bep3.AtomicSwap
 		return bep3.AtomicSwap{}, err
 	}
 
-	err = kc.Keybase.GetCodec().UnmarshalJSON(result, &swap)
+	err = kc.Cdc.UnmarshalJSON(result, &swap)
 	if err != nil {
 		return bep3.AtomicSwap{}, err
 	}
@@ -36,7 +36,7 @@ func (kc *KavaClient) GetSwapByID(swapID tmbytes.HexBytes) (swap bep3.AtomicSwap
 // GetAccount gets the account associated with an address on Kava
 func (kc *KavaClient) GetAccount(addr sdk.AccAddress) (acc authtypes.BaseAccount, err error) {
 	params := authtypes.NewQueryAccountParams(addr)
-	bz, err := kc.Keybase.GetCodec().MarshalJSON(params)
+	bz, err := kc.Cdc.MarshalJSON(params)
 	if err != nil {
 		return authtypes.BaseAccount{}, err
 	}
@@ -48,7 +48,7 @@ func (kc *KavaClient) GetAccount(addr sdk.AccAddress) (acc authtypes.BaseAccount
 		return authtypes.BaseAccount{}, err
 	}
 
-	err = kc.Keybase.GetCodec().UnmarshalJSON(result, &acc)
+	err = kc.Cdc.UnmarshalJSON(result, &acc)
 	if err != nil {
 		return authtypes.BaseAccount{}, err
 	}
