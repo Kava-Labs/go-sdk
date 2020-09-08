@@ -86,14 +86,9 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 		return nil, fmt.Errorf("Keys are missing, must to set key")
 	}
 
-	var chainID string
-	switch kc.Network {
-	case LocalNetwork:
-		chainID = LocalChainID
-	case TestNetwork:
-		chainID = TestChainID
-	case ProdNetwork:
-		chainID = ProdChainID
+	chainID, err := kc.GetChainID()
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch chain id: %w", err)
 	}
 
 	signMsg := &authtypes.StdSignMsg{
