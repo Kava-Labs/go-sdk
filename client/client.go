@@ -17,14 +17,13 @@ import (
 
 // KavaClient facilitates interaction with the Kava blockchain
 type KavaClient struct {
-	Network ChainNetwork
 	HTTP    *rpcclient.HTTP
 	Keybase keys.KeyManager
 	Cdc     *amino.Codec
 }
 
 // NewKavaClient creates a new KavaClient
-func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr string, networkType ChainNetwork) *KavaClient {
+func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr string) *KavaClient {
 	// Set up HTTP client
 	http, err := rpcclient.NewHTTP(rpcAddr, "/websocket")
 	if err != nil {
@@ -39,7 +38,6 @@ func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr str
 	}
 
 	return &KavaClient{
-		Network: networkType,
 		HTTP:    http,
 		Keybase: keyManager,
 		Cdc:     cdc,

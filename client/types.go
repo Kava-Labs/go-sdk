@@ -8,21 +8,3 @@ const (
 	Sync
 	Commit
 )
-
-// ChainNetwork is the name of the blockchain
-type ChainNetwork uint8
-
-const (
-	LocalNetwork ChainNetwork = iota
-	TestNetwork
-	ProdNetwork
-)
-
-const (
-	// LocalChainID is for local development
-	LocalChainID = "testing"
-	// TestChainID is Kava's latest testnet
-	TestChainID = "kava-testnet-6000"
-	// ProdChainID is Kava's mainnet
-	ProdChainID = "kava-3"
-)
