@@ -56,6 +56,14 @@ func (kc *KavaClient) GetAccount(addr sdk.AccAddress) (acc authtypes.BaseAccount
 	return acc, err
 }
 
+func (kc *KavaClient) GetChainID() (string, error) {
+	result, err := kc.HTTP.Status()
+	if err != nil {
+		return "", err
+	}
+	return result.NodeInfo.Network, nil
+}
+
 // ABCIQuery sends a query to Kava
 func (kc *KavaClient) ABCIQuery(path string, data tmbytes.HexBytes) ([]byte, error) {
 	if err := ValidateABCIQuery(path, data); err != nil {
