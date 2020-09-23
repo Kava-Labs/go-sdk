@@ -13,11 +13,11 @@ import (
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/go-bip39"
-	sdk "github.com/kava-labs/cosmos-sdk/types"
-	authtypes "github.com/kava-labs/cosmos-sdk/x/auth/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/kava-labs/tendermint/crypto"
-	"github.com/kava-labs/tendermint/crypto/secp256k1"
+	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/go-amino"
 )
 

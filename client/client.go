@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	sdk "github.com/kava-labs/cosmos-sdk/types"
-	authtypes "github.com/kava-labs/cosmos-sdk/x/auth/types"
-	"github.com/kava-labs/tendermint/libs/log"
-	rpcclient "github.com/kava-labs/tendermint/rpc/client"
-	ctypes "github.com/kava-labs/tendermint/rpc/core/types"
-	tmtypes "github.com/kava-labs/tendermint/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/tendermint/tendermint/libs/log"
+	rpcclient "github.com/tendermint/tendermint/rpc/client"
+	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 	"github.com/tendermint/go-amino"
 
 	"github.com/kava-labs/go-sdk/keys"
