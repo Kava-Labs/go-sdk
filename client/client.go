@@ -17,14 +17,13 @@ import (
 
 // KavaClient facilitates interaction with the Kava blockchain
 type KavaClient struct {
-	Network ChainNetwork
 	HTTP    *rpcclient.HTTP
 	Keybase keys.KeyManager
 	Cdc     *amino.Codec
 }
 
 // NewKavaClient creates a new KavaClient
-func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr string, networkType ChainNetwork) *KavaClient {
+func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr string) *KavaClient {
 	// Set up HTTP client
 	http, err := rpcclient.NewHTTP(rpcAddr, "/websocket")
 	if err != nil {
@@ -39,7 +38,6 @@ func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr str
 	}
 
 	return &KavaClient{
-		Network: networkType,
 		HTTP:    http,
 		Keybase: keyManager,
 		Cdc:     cdc,
@@ -86,14 +84,9 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 		return nil, fmt.Errorf("Keys are missing, must to set key")
 	}
 
-	var chainID string
-	switch kc.Network {
-	case LocalNetwork:
-		chainID = LocalChainID
-	case TestNetwork:
-		chainID = TestChainID
-	case ProdNetwork:
-		chainID = ProdChainID
+	chainID, err := kc.GetChainID()
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch chain id: %w", err)
 	}
 
 	signMsg := &authtypes.StdSignMsg{

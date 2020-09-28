@@ -378,8 +378,8 @@ type AllowedCollateralParam struct {
 	AuctionSize         bool   `json:"auction_size" yaml:"auction_size"`
 	LiquidationPenalty  bool   `json:"liquidation_penalty" yaml:"liquidation_penalty"`
 	Prefix              bool   `json:"prefix" yaml:"prefix"`
-	SpotMarketID        bool   `json:"market_id" yaml:"market_id"`
-	LiquidationMarketID bool   `json:"market_id" yaml:"market_id"`
+	SpotMarketID        bool   `json:"spot_market_id" yaml:"spot_market_id"`
+	LiquidationMarketID bool   `json:"liquidation_market_id" yaml:"liquidation_market_id"`
 	ConversionFactor    bool   `json:"conversion_factor" yaml:"conversion_factor"`
 }
 
