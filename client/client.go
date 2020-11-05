@@ -6,11 +6,11 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/log"
 	rpcclient "github.com/tendermint/tendermint/rpc/client/http"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"github.com/tendermint/go-amino"
 
 	"github.com/kava-labs/go-sdk/keys"
 )
@@ -44,9 +44,16 @@ func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr str
 	}
 }
 
-// Broadcast sends a message to the Kava blockchain as a transaction
+// Broadcast sends a message to the Kava blockchain as a transaction.
+// This pays no transaction fees.
 func (kc *KavaClient) Broadcast(m sdk.Msg, syncType SyncType) (*ctypes.ResultBroadcastTx, error) {
-	signBz, err := kc.sign(m)
+	fee := authtypes.NewStdFee(250000, nil)
+	return kc.BroadcastWithFee(m, fee, syncType)
+}
+
+// BroadcastWithFee sends a message to the Kava blockchain as a transaction, paying the specified transaction fee.
+func (kc *KavaClient) BroadcastWithFee(m sdk.Msg, fee authtypes.StdFee, syncType SyncType) (*ctypes.ResultBroadcastTx, error) {
+	signBz, err := kc.sign(m, fee)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +86,7 @@ func (kc *KavaClient) Broadcast(m sdk.Msg, syncType SyncType) (*ctypes.ResultBro
 	}
 }
 
-func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
+func (kc *KavaClient) sign(m sdk.Msg, fee authtypes.StdFee) ([]byte, error) {
 	if kc.Keybase == nil {
 		return nil, fmt.Errorf("Keys are missing, must to set key")
 	}
@@ -93,7 +100,7 @@ func (kc *KavaClient) sign(m sdk.Msg) ([]byte, error) {
 		ChainID:       chainID,
 		AccountNumber: 0,
 		Sequence:      0,
-		Fee:           authtypes.NewStdFee(250000, nil),
+		Fee:           fee,
 		Msgs:          []sdk.Msg{m},
 		Memo:          "",
 	}
