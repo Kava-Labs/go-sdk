@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/log"
 	rpcclient "github.com/tendermint/tendermint/rpc/client/http"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -19,11 +19,11 @@ import (
 type KavaClient struct {
 	HTTP    *rpcclient.HTTP
 	Keybase keys.KeyManager
-	Cdc     *amino.Codec
+	Cdc     *codec.Codec
 }
 
 // NewKavaClient creates a new KavaClient
-func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr string) *KavaClient {
+func NewKavaClient(cdc *codec.Codec, mnemonic string, coinID uint32, rpcAddr string) *KavaClient {
 	// Set up HTTP client
 	http, err := rpcclient.New(rpcAddr, "/websocket")
 	if err != nil {
