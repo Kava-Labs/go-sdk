@@ -1,17 +1,27 @@
 package keys
 
 import (
+	"os"
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/kava-labs/kava/app"
 	"github.com/stretchr/testify/require"
 )
 
 const (
 	TestMnenomic     = "equip town gesture square tomorrow volume nephew minute witness beef rich gadget actress egg sing secret pole winter alarm law today check violin uncover"
-	TestExpectedAddr = "kava15qdefkmwswysgg4qxgqpqr35k3m49pkx2jdfnw"
+	TestExpectedAddr = "kava1ffv7nhd3z6sych2qpqkk03ec6hzkmufy0r2s4c"
 	TestKavaCoinID   = 459
 )
 
+func TestMain(m *testing.M) {
+	cfg := sdk.GetConfig()
+	app.SetBech32AddressPrefixes(cfg)
+	app.SetBip44CoinType(cfg)
+	cfg.Seal()
+	os.Exit(m.Run())
+}
 func TestNewMnemonicKeyManager(t *testing.T) {
 
 	tests := []struct {
