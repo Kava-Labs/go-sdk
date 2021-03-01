@@ -16,9 +16,10 @@ const (
 )
 
 func TestMain(m *testing.M) {
-	kavaConfig := sdk.GetConfig()
-	app.SetBech32AddressPrefixes(kavaConfig)
-	kavaConfig.Seal()
+	cfg := sdk.GetConfig()
+	app.SetBech32AddressPrefixes(cfg)
+	app.SetBip44CoinType(cfg)
+	cfg.Seal()
 	os.Exit(m.Run())
 }
 func TestNewMnemonicKeyManager(t *testing.T) {
