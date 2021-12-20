@@ -1,29 +1,30 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"os"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/tendermint/go-amino"
+	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	"github.com/tendermint/tendermint/libs/log"
 	rpcclient "github.com/tendermint/tendermint/rpc/client/http"
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/kava-labs/go-sdk/keys"
+	"github.com/kava-labs/kava/app"
 )
 
 // KavaClient facilitates interaction with the Kava blockchain
 type KavaClient struct {
 	HTTP    *rpcclient.HTTP
 	Keybase keys.KeyManager
-	Cdc     *amino.Codec
+	Cdc     *codec.LegacyAmino
 }
 
 // NewKavaClient creates a new KavaClient
-func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr string) *KavaClient {
+func NewKavaClient(cdc *codec.LegacyAmino, mnemonic string, coinID uint32, rpcAddr string) *KavaClient {
 	// Set up HTTP client
 	http, err := rpcclient.New(rpcAddr, "/websocket")
 	if err != nil {
@@ -46,57 +47,90 @@ func NewKavaClient(cdc *amino.Codec, mnemonic string, coinID uint32, rpcAddr str
 
 // Broadcast sends a message to the Kava blockchain as a transaction.
 // This pays no transaction fees.
-func (kc *KavaClient) Broadcast(m sdk.Msg, syncType SyncType) (*ctypes.ResultBroadcastTx, error) {
-	fee := authtypes.NewStdFee(250000, nil)
-	return kc.BroadcastWithFee(m, fee, syncType)
+func (kc *KavaClient) Broadcast(clientCtx client.Context, m sdk.Msg, syncType SyncType) (res *sdk.TxResponse, err error) {
+	fee := legacytx.NewStdFee(250000, nil)
+	return kc.BroadcastWithFee(clientCtx, m, fee, syncType)
 }
 
 // BroadcastWithFee sends a message to the Kava blockchain as a transaction, paying the specified transaction fee.
-func (kc *KavaClient) BroadcastWithFee(m sdk.Msg, fee authtypes.StdFee, syncType SyncType) (*ctypes.ResultBroadcastTx, error) {
+func (kc *KavaClient) BroadcastWithFee(clientCtx client.Context, m sdk.Msg, fee legacytx.StdFee, syncType SyncType) (res *sdk.TxResponse, err error) {
 	signBz, err := kc.sign(m, fee)
 	if err != nil {
 		return nil, err
 	}
+
+	// build a legacy transaction
+	sigs := []legacytx.StdSignature{legacytx.NewStdSignature(kc.Keybase.GetKeyRing().GetPubKey(), signBz)}
+	stdTx := legacytx.NewStdTx([]sdk.Msg{m}, fee, sigs, "")
+	stdTx.TimeoutHeight = 100000
+
+	var mode string
 	switch syncType {
 	case Async:
-		return kc.BroadcastTxAsync(signBz)
+		mode = "async"
 	case Sync:
-		return kc.BroadcastTxSync(signBz)
+		mode = "sync"
 	case Commit:
-		commitRes, err := kc.BroadcastTxCommit(signBz)
-		if err != nil {
-			return nil, err
-		}
-		if commitRes.CheckTx.IsErr() {
-			return &ctypes.ResultBroadcastTx{
-				Code: commitRes.CheckTx.Code,
-				Log:  commitRes.CheckTx.Log,
-				Hash: commitRes.Hash,
-				Data: commitRes.CheckTx.Data,
-			}, nil
-		}
-		return &ctypes.ResultBroadcastTx{
-			Code: commitRes.DeliverTx.Code,
-			Log:  commitRes.DeliverTx.Log,
-			Hash: commitRes.Hash,
-			Data: commitRes.DeliverTx.Data,
-		}, nil
+		mode = "commit"
 	default:
 		return nil, fmt.Errorf("unknown synctype")
 	}
+	legacyTx := app.LegacyTxBroadcastRequest{
+		Tx:   stdTx,
+		Mode: mode,
+	}
+
+	// Build the tx from the legacy tx object
+	builder := clientCtx.TxConfig.NewTxBuilder()
+	builder.SetFeeAmount(legacyTx.Tx.GetFee())
+	builder.SetGasLimit(legacyTx.Tx.GetGas())
+	builder.SetMemo(legacyTx.Tx.GetMemo())
+	builder.SetTimeoutHeight(legacyTx.Tx.GetTimeoutHeight())
+
+	signatures, err := legacyTx.Tx.GetSignaturesV2()
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: could use account retreiver here instead i.e.
+	//		 clientCtx.AccountRetriever.GetAccountNumberSequence(clientCtx, addr)
+	for i, sig := range signatures {
+		addr := sdk.AccAddress(sig.PubKey.Address())
+		acc, err := kc.GetAccount(context.Background(), addr)
+		if err != nil {
+			return nil, err
+		}
+		signatures[i].Sequence = acc.GetSequence()
+	}
+
+	err = builder.SetSignatures(signatures...)
+	if err != nil {
+		return nil, err
+	}
+
+	txBytes, err := clientCtx.TxConfig.TxEncoder()(builder.GetTx())
+	if err != nil {
+		return nil, err
+	}
+
+	clientCtx = clientCtx.WithBroadcastMode(legacyTx.Mode)
+	res, err = clientCtx.BroadcastTx(txBytes)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
-func (kc *KavaClient) sign(m sdk.Msg, fee authtypes.StdFee) ([]byte, error) {
+func (kc *KavaClient) sign(m sdk.Msg, fee legacytx.StdFee) ([]byte, error) {
 	if kc.Keybase == nil {
 		return nil, fmt.Errorf("Keys are missing, must to set key")
 	}
-
-	chainID, err := kc.GetChainID()
+	chainID, err := kc.GetChainID(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("could not fetch chain id: %w", err)
 	}
 
-	signMsg := &authtypes.StdSignMsg{
+	signMsg := &legacytx.StdSignMsg{
 		ChainID:       chainID,
 		AccountNumber: 0,
 		Sequence:      0,
@@ -106,18 +140,18 @@ func (kc *KavaClient) sign(m sdk.Msg, fee authtypes.StdFee) ([]byte, error) {
 	}
 
 	if signMsg.Sequence == 0 || signMsg.AccountNumber == 0 {
-		fromAddr := kc.Keybase.GetAddr()
-		acc, err := kc.GetAccount(fromAddr)
+		fromAddr := kc.Keybase.GetKeyRing().GetAddress()
+		acc, err := kc.GetAccount(context.Background(), fromAddr)
 		if err != nil {
 			return nil, err
 		}
 
-		if acc.Address.Empty() {
+		if acc.GetAddress().Empty() {
 			return nil, fmt.Errorf("the signer account does not exist on kava")
 		}
 
-		signMsg.Sequence = acc.Sequence
-		signMsg.AccountNumber = acc.AccountNumber
+		signMsg.Sequence = acc.GetSequence()
+		signMsg.AccountNumber = acc.GetAccountNumber()
 	}
 
 	for _, m := range signMsg.Msgs {
@@ -132,28 +166,4 @@ func (kc *KavaClient) sign(m sdk.Msg, fee authtypes.StdFee) ([]byte, error) {
 	}
 
 	return signedMsg, nil
-}
-
-// BroadcastTxCommit sends a transaction using commit
-func (kc *KavaClient) BroadcastTxCommit(tx tmtypes.Tx) (*ctypes.ResultBroadcastTxCommit, error) {
-	if err := ValidateTx(tx); err != nil {
-		return nil, err
-	}
-	return kc.HTTP.BroadcastTxCommit(tx)
-}
-
-// BroadcastTxAsync sends a transaction using async
-func (kc *KavaClient) BroadcastTxAsync(tx tmtypes.Tx) (*ctypes.ResultBroadcastTx, error) {
-	if err := ValidateTx(tx); err != nil {
-		return nil, err
-	}
-	return kc.HTTP.BroadcastTxAsync(tx)
-}
-
-// BroadcastTxSync sends a transaction using sync
-func (kc *KavaClient) BroadcastTxSync(tx tmtypes.Tx) (*ctypes.ResultBroadcastTx, error) {
-	if err := ValidateTx(tx); err != nil {
-		return nil, err
-	}
-	return kc.HTTP.BroadcastTxSync(tx)
 }
