@@ -41,7 +41,7 @@ func TestNewMnemonicKeyManager(t *testing.T) {
 				require.Nil(t, err)
 
 				// Confirm correct address
-				addr := keyManager.GetAddr()
+				addr := keyManager.GetKeyRing().GetAddress()
 				require.Equal(t, TestExpectedAddr, addr.String())
 			} else {
 				require.NotNil(t, err)

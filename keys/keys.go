@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 )
 
@@ -20,7 +19,7 @@ const (
 // KeyManager is an interface for common methods on KeyManagers
 type KeyManager interface {
 	GetKeyBase() keyring.Keyring
-	GetAddr() sdk.AccAddress
+	GetKeyRing() keyring.Info
 	Sign(legacytx.StdSignMsg, *codec.LegacyAmino) ([]byte, error)
 }
 
@@ -35,16 +34,16 @@ func NewMnemonicKeyManager(mnemonic string, coinID uint32) (KeyManager, error) {
 }
 
 type keyManager struct {
-	addr    sdk.AccAddress
 	keybase keyring.Keyring
+	keyring keyring.Info
 }
 
 func (m *keyManager) GetKeyBase() keyring.Keyring {
 	return m.keybase
 }
 
-func (m *keyManager) GetAddr() sdk.AccAddress {
-	return m.addr
+func (m *keyManager) GetKeyRing() keyring.Info {
+	return m.keyring
 }
 
 // Sign signs a standard msg and marshals the result to bytes
@@ -96,6 +95,6 @@ func (m *keyManager) recoveryFromMnemonic(mnemonic, keyPath string) error {
 	}
 
 	m.keybase = kb
-	m.addr = krInfo.GetAddress()
+	m.keyring = krInfo
 	return nil
 }
